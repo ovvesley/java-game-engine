@@ -6,6 +6,7 @@ import org.lwjgl.glfw.GLFWWindowFocusCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryUtil;
 
+import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11C.*;
 
@@ -35,6 +36,8 @@ public class Window {
 
         init();
         loop();
+
+        cleanMemory();
     }
 
     private void configureGlfw(){
@@ -42,6 +45,15 @@ public class Window {
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
         glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+    }
+
+    private void cleanMemory()
+    {
+        glfwFreeCallbacks(glfwWindow);
+        glfwDestroyWindow(glfwWindow);
+
+        glfwTerminate();
+        glfwSetErrorCallback(null).free();
     }
 
     private long createWindow () {
@@ -63,12 +75,20 @@ public class Window {
 
         glfwWindow = createWindow();
 
+        registerCallback(glfwWindow);
+
         glfwMakeContextCurrent(glfwWindow);
         glfwSwapInterval(1);//enable v-sync
         glfwShowWindow(glfwWindow);
 
         GL.createCapabilities();
 
+    }
+
+    private void registerCallback(long glfwWindow) {
+        glfwSetCursorPosCallback(glfwWindow, MouseListener::mousePositionCallback);
+        glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
+        glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
     }
 
     public void loop(){
