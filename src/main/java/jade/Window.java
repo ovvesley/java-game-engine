@@ -2,7 +2,6 @@ package jade;
 
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
-import org.lwjgl.glfw.GLFWWindowFocusCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryUtil;
 
@@ -75,7 +74,7 @@ public class Window {
 
         glfwWindow = createWindow();
 
-        registerCallback(glfwWindow);
+        registerCallbacks(glfwWindow);
 
         glfwMakeContextCurrent(glfwWindow);
         glfwSwapInterval(1);//enable v-sync
@@ -85,10 +84,13 @@ public class Window {
 
     }
 
-    private void registerCallback(long glfwWindow) {
+    private void registerCallbacks(long glfwWindow) {
+
         glfwSetCursorPosCallback(glfwWindow, MouseListener::mousePositionCallback);
         glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
         glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
+
+        glfwSetKeyCallback(glfwWindow, KeyListener::keyCallback);
     }
 
     public void loop(){
