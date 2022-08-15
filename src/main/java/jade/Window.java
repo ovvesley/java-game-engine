@@ -4,16 +4,17 @@ import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryUtil;
+import util.Time;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11C.*;
 
 public class Window {
     private int width, heigth;
     private String title;
 
     private long glfwWindow;
+    private Scene scene = new LevelScene();
 
     private static Window window = null;
 
@@ -30,6 +31,9 @@ public class Window {
         return Window.window;
     }
 
+    public static void changeScene(Scene scene) {
+        window.scene = scene;
+    }
     public void run(){
         System.out.println("Hello LWJGL" + Version.getVersion() + "!");
 
@@ -38,6 +42,7 @@ public class Window {
 
         cleanMemory();
     }
+
 
     private void configureGlfw(){
         glfwDefaultWindowHints();
@@ -85,23 +90,33 @@ public class Window {
     }
 
     private void registerCallbacks(long glfwWindow) {
-
         glfwSetCursorPosCallback(glfwWindow, MouseListener::mousePositionCallback);
         glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
         glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
-
         glfwSetKeyCallback(glfwWindow, KeyListener::keyCallback);
     }
 
     public void loop(){
+        float beginTime = Time.getTime();
+        float endTime   = Time.getTime();
+        float delta     = -1.0f;
+
         while (!glfwWindowShouldClose(glfwWindow)){
             glfwPollEvents();
 
-            glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT);
+            if(delta > 0)
+            {
+                this.scene.update(delta);
+            }
+
+            endTime = Time.getTime();
+            delta   = endTime - beginTime;
+            beginTime = endTime;
 
             glfwSwapBuffers(glfwWindow);
         }
     }
+
+
 
 }
