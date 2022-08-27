@@ -14,7 +14,7 @@ public class Window {
     private String title;
 
     private long glfwWindow;
-    private Scene scene = new LevelScene();
+    private Scene scene = null;
 
     private static Window window = null;
 
@@ -38,6 +38,7 @@ public class Window {
         System.out.println("Hello LWJGL" + Version.getVersion() + "!");
 
         init();
+        this.scene = new LevelEditorScene();
         loop();
 
         cleanMemory();

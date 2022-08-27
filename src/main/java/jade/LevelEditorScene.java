@@ -1,5 +1,6 @@
 package jade;
 
+import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 import renderer.Shader;
 
@@ -15,15 +16,15 @@ public class LevelEditorScene extends Scene{
     private static final String vertexShadersSrc     = "assets/shaders/default.vertex.glsl";
     private static final String fragmentShaderSrc    = "assets/shaders/default.fragment.glsl";
     public LevelEditorScene (){
+        this.camera = new Camera(new Vector2f());
         this.defaultShader = new Shader(vertexShadersSrc, fragmentShaderSrc);
-
         this.init();
     }
 
     private static float [] vertexies = {
-            0.5f, -0.5f, 0.0f,          1.0f, 0.0f, 0.0f, 1.0f, // bottom right
-            -0.5f, 0.5f, 0.0f,          0.0f, 1.0f, 0.0f, 1.0f, // top left
-            0.5f, 0.5f, 0.0f,           0.0f, 0.0f, 1.0f, 1.0f, // top right
+            200.5f, -0.5f, 0.0f,          1.0f, 0.0f, 0.0f, 1.0f, // bottom right
+            -0.5f, 200.5f, 0.0f,          0.0f, 1.0f, 0.0f, 1.0f, // top left
+            200.5f, 200.5f, 0.0f,           0.0f, 0.0f, 1.0f, 1.0f, // top right
             -0.5f, -0.5f, 0.0f,         1.0f, 1.0f, 0.0f, 1.0f, // bottom left
     };
 
@@ -76,7 +77,11 @@ public class LevelEditorScene extends Scene{
     public void update(float delta) {
 
         System.out.println("Level Editor Scene");
+        moveCamera(delta);
+
         defaultShader.use();
+        defaultShader.uploadMat4f("uProjection", camera.getProjectionMatrix());
+        defaultShader.uploadMat4f("uView", camera.getViewMatrix());
 
         glBindVertexArray(vertexArrayObjectId);
 
@@ -85,9 +90,13 @@ public class LevelEditorScene extends Scene{
 
         glDrawElements(GL_TRIANGLES, elements.length, GL_UNSIGNED_INT, 0);
 
+
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
-
         defaultShader.detach();
+    }
+
+    public void moveCamera(float delta){
+        camera.position.x -= delta * 50.0f;
     }
 }
